@@ -1,0 +1,36 @@
+---
+title: "STA108 Final Project"
+author: "Madalyn Papenfuss, Sung Ah Lee, Chang, Brian"
+date: "2023-12-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+list.files()
+data = read.csv("heart_disease_health_indicators_BRFSS2015.csv")
+# colnames = HeartDiseaseorAttack, HighBP, HighChol, CholCheck, BMI, Smoker, Stroke, Diabetes, PhysActivity, Fruit, Veggies, HvyAlcoholConsump, AnyHealthcare, NoDocbcCost, GenHlth, MentHlth, PhysHlth, DiffWalk
+rows = c(1,2,3,6,7,8,9)
+data = data[,rows]
+#interested in col: HeartDiseaseorAttack, HighBP, HighChol, BMI, Smoker, Stroke, Diabetes, PhysActivity (first 8 col)
+head(data)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
