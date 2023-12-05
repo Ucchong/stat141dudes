@@ -9,28 +9,56 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
+```{r}
 list.files()
 data = read.csv("heart_disease_health_indicators_BRFSS2015.csv")
 # colnames = HeartDiseaseorAttack, HighBP, HighChol, CholCheck, BMI, Smoker, Stroke, Diabetes, PhysActivity, Fruit, Veggies, HvyAlcoholConsump, AnyHealthcare, NoDocbcCost, GenHlth, MentHlth, PhysHlth, DiffWalk
-rows = c(1,2,3,6,7,8,9)
-data = data[,rows]
+head(data)
+col_name = c(1,2,3,5,6,7,8,9)
+data = data[,col_name]
+data
 #interested in col: HeartDiseaseorAttack, HighBP, HighChol, BMI, Smoker, Stroke, Diabetes, PhysActivity (first 8 col)
 head(data)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+set.seed(13)
+train_index <- sample(1:nrow(data), 0.1 * nrow(data))  # 10% for training
+train_data <- data[train_index, ]
+test_data <- data[-train_index, ]
+head(test_data)
+plot(train_data$HeartDiseaseorAttack ~ train_data$HighBP, train_data)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+logreg=glm(HeartDiseaseorAttack ~ BMI, data = train_data, family = binomial)
+lmreg = lm(HeartDiseaseorAttack ~ BMI, data = train_data)
+summary(lmreg)
+logreg1=glm(HeartDiseaseorAttack ~ HighBP + HighChol, data = train_data, family = binomial)
+
+head(train_data$HighBP)
+logreg2=glm(HeartDiseaseorAttack ~ HighBP, data = data, family = binomial)
+logreg3=glm(HeartDiseaseorAttack ~ HighBP + Smoker + HighChol, data = train_data, family = binomial)
+logreg4=glm(HeartDiseaseorAttack ~ HighBP + Smoker + HighChol + Stroke, data = train_data, family = binomial)
+logreg5=glm(HeartDiseaseorAttack ~ HighBP + Smoker + HighChol + Stroke + Diabetes + PhysActivity, data = train_data, family = binomial)
+summary(logreg5)
+
+prob=predict(logreg5, type = "response")
+unique(predict)
+predict=ifelse(prob<.5,1,0)
+summary(logreg4)
+confusion_matrix <- print(table(test_data$HeartDiseaseorAttack, predict))
+print(sum(diag(confusion_matrix)) / sum(confusion_matrix))
+```
+
+
+```{r}
+prediction <- predict(logreg, newdata = test_data, type = "response")
+predicted_classes <- ifelse(prediction > 0.5, 1, 0)
+unique(predicted_classes)
+confusion_matrix <- print(table(test_data$HeartDiseaseorAttack, predicted_classes))
+confusion_matrix <- table(predicted_classes, test_data$HeartDiseaseorAttack);confusion_matrix
+print(sum(diag(confusion_matrix)) / sum(confusion_matrix))
+```
+
