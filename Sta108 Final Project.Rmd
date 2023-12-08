@@ -9,56 +9,98 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+
+```
 
 ```{r}
-list.files()
 data = read.csv("heart_disease_health_indicators_BRFSS2015.csv")
 # colnames = HeartDiseaseorAttack, HighBP, HighChol, CholCheck, BMI, Smoker, Stroke, Diabetes, PhysActivity, Fruit, Veggies, HvyAlcoholConsump, AnyHealthcare, NoDocbcCost, GenHlth, MentHlth, PhysHlth, DiffWalk
 head(data)
-col_name = c(1,2,3,5,6,7,8,9)
-data = data[,col_name]
-data
+#col_name = c(1,2,3,5,6,7,8,9)
+#data = data[,col_name]
 #interested in col: HeartDiseaseorAttack, HighBP, HighChol, BMI, Smoker, Stroke, Diabetes, PhysActivity (first 8 col)
-head(data)
 ```
 
 ```{r}
+# creating test and train data
 set.seed(13)
-train_index <- sample(1:nrow(data), 0.1 * nrow(data))  # 10% for training
+train_index <- sample(1:nrow(data), 0.5 * nrow(data))  # 50% for training 
 train_data <- data[train_index, ]
 test_data <- data[-train_index, ]
 head(test_data)
-plot(train_data$HeartDiseaseorAttack ~ train_data$HighBP, train_data)
+max(test_data$Income)
+#WILL CHANGE TO K-FOLD cv
+
 ```
 
 ```{r}
-logreg=glm(HeartDiseaseorAttack ~ BMI, data = train_data, family = binomial)
-lmreg = lm(HeartDiseaseorAttack ~ BMI, data = train_data)
-summary(lmreg)
-logreg1=glm(HeartDiseaseorAttack ~ HighBP + HighChol, data = train_data, family = binomial)
+# Using train_data to create our model
+logreg=glm(HeartDiseaseorAttack ~ HighBP + HighChol + CholCheck + BMI + Smoker + Stroke + Diabetes + PhysActivity + Fruits + Veggies + HvyAlcoholConsump + AnyHealthcare + NoDocbcCost + GenHlth + MentHlth + PhysHlth + DiffWalk + Sex + Age + Education + Income, data = train_data, family = binomial) #which variables are significant?
 
-head(train_data$HighBP)
-logreg2=glm(HeartDiseaseorAttack ~ HighBP, data = data, family = binomial)
-logreg3=glm(HeartDiseaseorAttack ~ HighBP + Smoker + HighChol, data = train_data, family = binomial)
-logreg4=glm(HeartDiseaseorAttack ~ HighBP + Smoker + HighChol + Stroke, data = train_data, family = binomial)
-logreg5=glm(HeartDiseaseorAttack ~ HighBP + Smoker + HighChol + Stroke + Diabetes + PhysActivity, data = train_data, family = binomial)
-summary(logreg5)
-
-prob=predict(logreg5, type = "response")
-unique(predict)
-predict=ifelse(prob<.5,1,0)
-summary(logreg4)
-confusion_matrix <- print(table(test_data$HeartDiseaseorAttack, predict))
-print(sum(diag(confusion_matrix)) / sum(confusion_matrix))
+summary(logreg)
+#significant variables = 
+## (Intercept)       -7.7828371  0.1424933 -54.619  < 2e-16 ***
+# HighBP             0.5238218  0.0249983  20.954  < 2e-16 ***
+# HighChol           0.6099891  0.0231388  26.362  < 2e-16 ***
+# CholCheck          0.4037878  0.0901655   4.478 7.52e-06
+# Smoker             0.3481076  0.0221743  15.699  < 2e-16 ***
+# Stroke             0.9670444  0.0349096  27.701  < 2e-16 ***
+# Diabetes           0.1414394  0.0126559  11.176  < 2e-16 ***
+# HvyAlcoholConsump -0.2474005  0.0546589  -4.526 6.00e-06 ***
+# NoDocbcCost        0.2767829  0.0376501   7.351 1.96e-13 ***
+# GenHlth            0.4770993  0.0133503  35.737  < 2e-16 ***
+# DiffWalk           0.3139449  0.0272785  11.509  < 2e-16 ***
+# Sex                0.7463776  0.0225979  33.029  < 2e-16 ***
+# Age                0.2633630  0.0051587  51.052  < 2e-16 ***
+# Income            -0.0461303  0.0059884  -7.703 1.33e-14 ***
+logreg2 = glm(HeartDiseaseorAttack ~ HighBP + HighChol + CholCheck + Smoker + Stroke + Diabetes + HvyAlcoholConsump + NoDocbcCost + GenHlth + DiffWalk + Sex + Age + Income, data = train_data, family = binomial)
+summary(logreg2)
 ```
 
 
 ```{r}
-prediction <- predict(logreg, newdata = test_data, type = "response")
+# using logreg2 to predict test_data
+prediction <- predict(logreg2, test_data, type = "response")
 predicted_classes <- ifelse(prediction > 0.5, 1, 0)
+max(prediction)
 unique(predicted_classes)
 confusion_matrix <- print(table(test_data$HeartDiseaseorAttack, predicted_classes))
 confusion_matrix <- table(predicted_classes, test_data$HeartDiseaseorAttack);confusion_matrix
 print(sum(diag(confusion_matrix)) / sum(confusion_matrix))
+```
+
+```{r}
+#plotting in R
+logreg=glm(HeartDiseaseorAttack ~ HighBP + HighChol + CholCheck + BMI + Smoker + Stroke + Diabetes + PhysActivity + Fruits + Veggies + HvyAlcoholConsump + AnyHealthcare + NoDocbcCost + GenHlth + MentHlth + PhysHlth + DiffWalk + Sex + Age + Education + Income, data = train_data, family = binomial)
+
+#HIGH BP
+barplot(table(train_data$HighBP), col = c("red", "blue"), beside = T, names.arg = c("No High BP", "Yes High BP"), main = "High Blood Pressure Distribution", ylab = "Frequency")
+#HIGH CHOL
+barplot(table(train_data$HighChol), col = c("red", "blue"), beside = T, names.arg = c("No High Chol", "Yes High Chol"), main = "High Cholestrol Distribution", ylab = "Frequency")
+# CholCheck
+barplot(table(train_data$HighChol), col = c("red", "blue"), beside = T, names.arg = c("No High Chol", "Yes High Chol"), main = "High Cholestrol Distribution", ylab = "Frequency")
+```
+
+```{r}
+
+#age of people with heart attacks vs age of people without heart attacks
+cols = names(df) %in% c('points')
+data0 = subset(data, HeartDiseaseorAttack<1 )
+head(data0)
+
+
+data1 = subset(data, HeartDiseaseorAttack >= 1 )
+head(data1)
+
+
+
+boxplot(data1$Age, data0$Age)
+max(data1$Age)
+plot(test_data$BMI, test_data$Age)
+
+#INCOME of people with heart attacks vs INCOME of people without heart attacks
+
+#GEN Health of people with heart attacks vs GEN Health of people without heart attacks
 ```
 
