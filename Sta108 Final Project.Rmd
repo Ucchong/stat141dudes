@@ -38,6 +38,9 @@ max(test_data$Income)
 # Using train_data to create our model
 logreg=glm(HeartDiseaseorAttack ~ HighBP + HighChol + CholCheck + BMI + Smoker + Stroke + Diabetes + PhysActivity + Fruits + Veggies + HvyAlcoholConsump + AnyHealthcare + NoDocbcCost + GenHlth + MentHlth + PhysHlth + DiffWalk + Sex + Age + Education + Income, data = train_data, family = binomial) #which variables are significant?
 
+logregBMI = glm(HeartDiseaseorAttack ~ HighBP +BMI, data = train_data, family = binomial)
+summary(logregBMI)
+
 summary(logreg)
 #significant variables = 
 ## (Intercept)       -7.7828371  0.1424933 -54.619  < 2e-16 ***
@@ -73,13 +76,36 @@ print(sum(diag(confusion_matrix)) / sum(confusion_matrix))
 ```{r}
 #plotting in R
 logreg=glm(HeartDiseaseorAttack ~ HighBP + HighChol + CholCheck + BMI + Smoker + Stroke + Diabetes + PhysActivity + Fruits + Veggies + HvyAlcoholConsump + AnyHealthcare + NoDocbcCost + GenHlth + MentHlth + PhysHlth + DiffWalk + Sex + Age + Education + Income, data = train_data, family = binomial)
+logreg2 = glm(HeartDiseaseorAttack ~ HighBP + HighChol + CholCheck + Smoker + Stroke + Diabetes + HvyAlcoholConsump + NoDocbcCost + GenHlth + DiffWalk + Sex + Age + Income, data = train_data, family = binomial)
 
 #HIGH BP
 barplot(table(train_data$HighBP), col = c("red", "blue"), beside = T, names.arg = c("No High BP", "Yes High BP"), main = "High Blood Pressure Distribution", ylab = "Frequency")
 #HIGH CHOL
 barplot(table(train_data$HighChol), col = c("red", "blue"), beside = T, names.arg = c("No High Chol", "Yes High Chol"), main = "High Cholestrol Distribution", ylab = "Frequency")
 # CholCheck
-barplot(table(train_data$HighChol), col = c("red", "blue"), beside = T, names.arg = c("No High Chol", "Yes High Chol"), main = "High Cholestrol Distribution", ylab = "Frequency")
+barplot(table(train_data$CholCheck), col = c("red", "blue"), beside = T, names.arg = c("No Chol Check", "Yes Chol Check"), main = "Chol Check within 5 years Distribution", ylab = "Frequency")
+#Smoker
+barplot(table(train_data$Smoker), col = c("red", "blue"), beside = T, names.arg = c("No Smoker", "Smoker"), main = "Smoker Distribution", ylab = "Frequency")
+#Stroke
+barplot(table(train_data$Stroke), col = c("red", "blue"), beside = T, names.arg = c("No Stroke", "Yes Stroke"), main = "Stroke Distribution", ylab = "Frequency")
+# Diabetes
+barplot(table(train_data$Diabetes), col = c("red", "blue"), beside = T, names.arg = c("No Diabetes", "Yes Type 2 Diabetes", "Yes Type 1 Diabetes"), main = "High Diabetes Distribution", ylab = "Frequency")
+# HvyAlcoholConsump
+barplot(table(train_data$HvyAlcoholConsump), col = c("red", "blue"), beside = T, names.arg = c("No Heavy Alcohol Consump", "Yes Heavy Alcohol Consump"), main = "Heavy Alcohol Consump Distribution", ylab = "Frequency")
+# NoDocbcCost
+barplot(table(train_data$NoDocbcCost), col = c("red", "blue"), beside = T, names.arg = c("No - No Doc bc Cost", "Yes - No Doc bc Cost"), main = "No Doc bc Cost Distribution", ylab = "Frequency")
+# GenHlth
+barplot(table(train_data$GenHlth), col = c("red", "blue"), beside = T, names.arg = c("1 - GenHlth", "2 - GenHlth", "3 - GenHlth", "4 - GenHlth", "5 - GenHlth"), main = "General Health Distribution", ylab = "Frequency")
+# DiffWalk
+barplot(table(train_data$DiffWalk), col = c("red", "blue"), beside = T, names.arg = c("DiffWalk", "Yes DiffWalk"), main = "DiffWalk Distribution", ylab = "Frequency")
+# Sex
+barplot(table(train_data$Sex), col = c("red", "blue"), beside = T, names.arg = c("Male", "Female"), main = "Sex Distribution", ylab = "Frequency")
+# Age
+barplot(table(train_data$Age), col = c("red", "blue"), beside = T, names.arg = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"), main = "Age Distribution", ylab = "Frequency")
+# Income
+barplot(table(train_data$Income), col = c("red", "blue"), beside = T, main = "Income Distribution", ylab = "Frequency")
+unique(data$Age)
+
 ```
 
 ```{r}
@@ -103,4 +129,9 @@ plot(test_data$BMI, test_data$Age)
 
 #GEN Health of people with heart attacks vs GEN Health of people without heart attacks
 ```
+```{r}
+cor_matrix = cor(data[,c("Education", "Income")]);cor_matrix
+cor_matrix = cor(data[,c("GenHlth", "MentHlth", "PhysHlth")]);cor_matrix
+```
+
 
