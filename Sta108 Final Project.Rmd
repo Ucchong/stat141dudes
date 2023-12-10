@@ -1,4 +1,4 @@
----
+\---
 title: "STA108 Final Project"
 author: "Madalyn Papenfuss, Sung Ah Lee, Chang, Brian"
 date: "2023-12-01"
@@ -10,7 +10,13 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
+install.packages("cli")
 
+library("caret")
+install.packages("caret")
+install.packages("cli")
+
+library(caret)
 ```
 
 ```{r}
@@ -29,7 +35,6 @@ train_index <- sample(1:nrow(data), 0.5 * nrow(data))  # 50% for training
 train_data <- data[train_index, ]
 test_data <- data[-train_index, ]
 head(test_data)
-max(test_data$Income)
 #WILL CHANGE TO K-FOLD cv
 
 ```
@@ -38,10 +43,6 @@ max(test_data$Income)
 # Using train_data to create our model
 logreg=glm(HeartDiseaseorAttack ~ HighBP + HighChol + CholCheck + BMI + Smoker + Stroke + Diabetes + PhysActivity + Fruits + Veggies + HvyAlcoholConsump + AnyHealthcare + NoDocbcCost + GenHlth + MentHlth + PhysHlth + DiffWalk + Sex + Age + Education + Income, data = train_data, family = binomial) #which variables are significant?
 
-logregBMI = glm(HeartDiseaseorAttack ~ HighBP +BMI, data = train_data, family = binomial)
-summary(logregBMI)
-
-summary(logreg)
 #significant variables = 
 ## (Intercept)       -7.7828371  0.1424933 -54.619  < 2e-16 ***
 # HighBP             0.5238218  0.0249983  20.954  < 2e-16 ***
@@ -60,75 +61,72 @@ summary(logreg)
 logreg2 = glm(HeartDiseaseorAttack ~ HighBP + HighChol + CholCheck + Smoker + Stroke + Diabetes + HvyAlcoholConsump + NoDocbcCost + GenHlth + DiffWalk + Sex + Age + Income, data = train_data, family = binomial)
 summary(logreg2)
 ```
+```{r}
 
+  
+```
 
 ```{r}
 # using logreg2 to predict test_data
 prediction <- predict(logreg2, test_data, type = "response")
 predicted_classes <- ifelse(prediction > 0.5, 1, 0)
-max(prediction)
-unique(predicted_classes)
 confusion_matrix <- print(table(test_data$HeartDiseaseorAttack, predicted_classes))
-confusion_matrix <- table(predicted_classes, test_data$HeartDiseaseorAttack);confusion_matrix
 print(sum(diag(confusion_matrix)) / sum(confusion_matrix))
 ```
 
 ```{r}
 #plotting in R
-logreg=glm(HeartDiseaseorAttack ~ HighBP + HighChol + CholCheck + BMI + Smoker + Stroke + Diabetes + PhysActivity + Fruits + Veggies + HvyAlcoholConsump + AnyHealthcare + NoDocbcCost + GenHlth + MentHlth + PhysHlth + DiffWalk + Sex + Age + Education + Income, data = train_data, family = binomial)
-logreg2 = glm(HeartDiseaseorAttack ~ HighBP + HighChol + CholCheck + Smoker + Stroke + Diabetes + HvyAlcoholConsump + NoDocbcCost + GenHlth + DiffWalk + Sex + Age + Income, data = train_data, family = binomial)
+#logregmodel = glm(HeartDiseaseorAttack ~ HighBP + HighChol + CholCheck + Smoker + Stroke + Diabetes + HvyAlcoholConsump + NoDocbcCost + GenHlth + DiffWalk + Sex + Age + Income, data = train_data, family = binomial)
 
 #HIGH BP
-barplot(table(train_data$HighBP), col = c("red", "blue"), beside = T, names.arg = c("No High BP", "Yes High BP"), main = "High Blood Pressure Distribution", ylab = "Frequency")
+barplot(table(train_data$HighBP), col = c("tomato2", "darkgreen"), beside = T, names.arg = c("No High Blood Pressure", "High Blood Pressure"), main = "High Blood Pressure Distribution", ylab = "Frequency", sub="Indicates if the person has been told by a health professional \nthat they have High Blood Pressure.")
 #HIGH CHOL
-barplot(table(train_data$HighChol), col = c("red", "blue"), beside = T, names.arg = c("No High Chol", "Yes High Chol"), main = "High Cholestrol Distribution", ylab = "Frequency")
+barplot(table(train_data$HighChol), col = c("tomato2", "darkgreen"), beside = T, names.arg = c("No High Cholestrol", "High Cholestrol"), main = "High Cholestrol Distribution", ylab = "Frequency", sub="Indicates if the person has been told by a health professional that they have \nHigh Blood Cholesterol.")
 # CholCheck
-barplot(table(train_data$CholCheck), col = c("red", "blue"), beside = T, names.arg = c("No Chol Check", "Yes Chol Check"), main = "Chol Check within 5 years Distribution", ylab = "Frequency")
+barplot(table(train_data$CholCheck), col = c("tomato2", "darkgreen"), beside = T, names.arg = c("No Cholesterol Check", "Yes Cholesterol Check"), main = "Cholesterol Check Distribution", ylab = "Frequency", sub = "Indicates if the person has their cholesterol levels checked \nwithin the last 5 years.")
 #Smoker
-barplot(table(train_data$Smoker), col = c("red", "blue"), beside = T, names.arg = c("No Smoker", "Smoker"), main = "Smoker Distribution", ylab = "Frequency")
+barplot(table(train_data$Smoker), col = c("tomato2", "darkgreen"), beside = T, names.arg = c("No Smoker", "Smoker"), main = "Smoker Distribution", ylab = "Frequency", sub = "Indicates if the person has smoked at least 100 cigarettes.")
 #Stroke
-barplot(table(train_data$Stroke), col = c("red", "blue"), beside = T, names.arg = c("No Stroke", "Yes Stroke"), main = "Stroke Distribution", ylab = "Frequency")
+barplot(table(train_data$Stroke), col = c("tomato2", "darkgreen"), beside = T, names.arg = c("No Stroke History", "Stroke History"), main = "Stroke Distribution", ylab = "Frequency", sub = "Indicates if the person has a history of stroke.")
 # Diabetes
-barplot(table(train_data$Diabetes), col = c("red", "blue"), beside = T, names.arg = c("No Diabetes", "Yes Type 2 Diabetes", "Yes Type 1 Diabetes"), main = "High Diabetes Distribution", ylab = "Frequency")
+barplot(table(train_data$Diabetes), col = c("tomato2", "darkgreen"), beside = T, names.arg = c("No Diabetes", "Pre-Diabetes", "Diabetes"), main = "Diabetes Distribution", ylab = "Frequency")
 # HvyAlcoholConsump
-barplot(table(train_data$HvyAlcoholConsump), col = c("red", "blue"), beside = T, names.arg = c("No Heavy Alcohol Consump", "Yes Heavy Alcohol Consump"), main = "Heavy Alcohol Consump Distribution", ylab = "Frequency")
+barplot(table(train_data$HvyAlcoholConsump), col = c("tomato2", "darkgreen"), beside = T, names.arg = c("No Heavy Alcohol Consumption", "Heavy Alcohol Consumption"), main = "Heavy Alcohol Consumption Distribution", ylab = "Frequency", sub = "Indicates if the person has more than 14 drinks per week.")
 # NoDocbcCost
-barplot(table(train_data$NoDocbcCost), col = c("red", "blue"), beside = T, names.arg = c("No - No Doc bc Cost", "Yes - No Doc bc Cost"), main = "No Doc bc Cost Distribution", ylab = "Frequency")
-# GenHlth
-barplot(table(train_data$GenHlth), col = c("red", "blue"), beside = T, names.arg = c("1 - GenHlth", "2 - GenHlth", "3 - GenHlth", "4 - GenHlth", "5 - GenHlth"), main = "General Health Distribution", ylab = "Frequency")
+barplot(table(train_data$NoDocbcCost), col = c("tomato2", "darkgreen"), beside = T, names.arg = c("Did not experience", "No Doctor Visit because of Cost"), main = "No Doctor Because of The Cost", ylab = "Frequency", sub= "Indicates if the person wanted to visit a doctor within the past 1 year \nbut couldn’t, due to cost.")
 # DiffWalk
-barplot(table(train_data$DiffWalk), col = c("red", "blue"), beside = T, names.arg = c("DiffWalk", "Yes DiffWalk"), main = "DiffWalk Distribution", ylab = "Frequency")
+barplot(table(train_data$DiffWalk), col = c("tomato2", "darkgreen"), beside = T, names.arg = c("No Difficulty Walking", "Difficulty Walking"), main = "Difficulty Walking Distribution", ylab = "Frequency", sub = "Indicates if the person has difficulty while walking or climbing stairs.")
 # Sex
-barplot(table(train_data$Sex), col = c("red", "blue"), beside = T, names.arg = c("Male", "Female"), main = "Sex Distribution", ylab = "Frequency")
+barplot(table(train_data$Sex), col = c("tomato2", "darkgreen"), beside = T, names.arg = c("Female", "Male"), main = "Sex Distribution", ylab = "Frequency")
 # Age
-barplot(table(train_data$Age), col = c("red", "blue"), beside = T, names.arg = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"), main = "Age Distribution", ylab = "Frequency")
+color_gradient <- colorRampPalette(c("tomato2", "darkgreen"))
+colors.age <- color_gradient(13)
+barplot(table(train_data$Age), col = colors.age, beside = T, names.arg = c("18-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59", "60-64", "65-69", "70-74", "75-79", "80+"), las = 2, horiz = T, main = "Age Distribution", xlab = "Frequency", cex.names = 0.8)
 # Income
-barplot(table(train_data$Income), col = c("red", "blue"), beside = T, main = "Income Distribution", ylab = "Frequency")
-unique(data$Age)
-
+colors.Income <- color_gradient(8)
+barplot(table(train_data$Income), col = colors.Income, beside = T, names.arg = c("$10,000", "$20,000", "$30,000", "$40,000", "$50,000", "$60,000", "$70,000", "$75,000+"), main = "Income Distribution", cex.names=0.9, las = 2, horiz = T, xlab = "Frequency")
+# GenHlth
+colors.GenHlth <- color_gradient(5)
+barplot(table(train_data$GenHlth), col = colors.GenHlth, beside = T, names.arg = c("Excellent", "-", "Moderate", "-", "Poor"), main = "General Health Distribution", las = 2, horiz = T, xlab = "Frequency")
 ```
 
 ```{r}
-
 #age of people with heart attacks vs age of people without heart attacks
-cols = names(df) %in% c('points')
 data0 = subset(data, HeartDiseaseorAttack<1 )
-head(data0)
-
-
 data1 = subset(data, HeartDiseaseorAttack >= 1 )
-head(data1)
+boxplot(data0$Age,data1$Age, names.arg=c("Age of people without Heart Attacks", "Age of people with Heart Attacks"))
 
+boxplot(list(data0$Age, data1$Age),  col = c("tomato2", "darkgreen"), names = c("No Heart Attack", "Heart Attack"), xlab = "Heart Attack Status", ylab = "Age", main = "Boxplot of Age by Heart Attack Status") #outliers for young age and heart attacks
 
-
-boxplot(data1$Age, data0$Age)
-max(data1$Age)
-plot(test_data$BMI, test_data$Age)
+mean(data0$Age) #7.813858
+mean(data1$Age) #10.13121, older age
 
 #INCOME of people with heart attacks vs INCOME of people without heart attacks
 
 #GEN Health of people with heart attacks vs GEN Health of people without heart attacks
 ```
+
+
 ```{r}
 cor_matrix = cor(data[,c("Education", "Income")]);cor_matrix
 cor_matrix = cor(data[,c("GenHlth", "MentHlth", "PhysHlth")]);cor_matrix
